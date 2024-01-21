@@ -66,6 +66,7 @@ vector<Token> Tokenizer::parse(const string &inProgram) {
     case '-':
     case ';':
     case ',':
+    case '.':
       if (currentToken.mType != STRING_LITERAL) {
         endToken(currentToken, tokens);
         currentToken.mType = OPERATOR;
@@ -77,6 +78,11 @@ vector<Token> Tokenizer::parse(const string &inProgram) {
       break;
     case ' ':
     case '\t':
+      endToken(currentToken, tokens);
+      ++currentToken.mLineNumber;
+      break;
+    case '\r':
+    case '\n':
       endToken(currentToken, tokens);
       ++currentToken.mLineNumber;
       break;

@@ -9,7 +9,7 @@ using namespace blif2verilog;
 int main(int argc, char *argv[]) {
   cout << "simple parser start " << endl;
 
-  FILE *fh = fopen("dualRail.blif", "r");
+  FILE *fh = fopen("example.blif", "r");
   if (!fh) {
     cerr << "Couldn't open file for some reason" << endl;
   }
