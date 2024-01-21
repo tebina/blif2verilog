@@ -1,3 +1,5 @@
+#include "parser.cpp"
+#include "parser.hpp"
 #include "tokenizer.cpp"
 #include <cstdio>
 #include <iostream>
@@ -30,6 +32,8 @@ int main(int argc, char *argv[]) {
   for (Token currToken : tokens) {
     currToken.debugPrint();
   }
+  Parser parser;
+  parser.parse(tokens);
 
   return 0;
 }

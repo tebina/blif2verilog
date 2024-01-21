@@ -58,14 +58,9 @@ vector<Token> Tokenizer::parse(const string &inProgram) {
         currentToken.mText.append(1, currCh);
       }
       break;
-    case '{':
-    case '}':
-    case '(':
-    case ')':
     case '=':
-    case '-':
+    case ':':
     case ';':
-    case ',':
     case '.':
       if (currentToken.mType != STRING_LITERAL) {
         endToken(currentToken, tokens);
