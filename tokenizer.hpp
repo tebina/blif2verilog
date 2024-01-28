@@ -36,9 +36,9 @@ private:
 class Tokenizer {
 public:
   vector<Token> parse(const string &inProgram);
-  void endToken(Token &token, vector<Token> &tokens);
 
 private:
+  void endToken(Token &token, vector<Token> &tokens);
 };
 
 } // namespace blif2verilog

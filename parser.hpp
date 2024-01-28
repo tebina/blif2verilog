@@ -27,6 +27,9 @@ public:
 
 private:
   optional<Type> expectType();
+  bool expectModelDefinition();
+  bool expectInputsDefinition();
+  bool expectOutputsDefinition();
   optional<blif2verilog::Token> expectIdentifier(const string &name = string());
   optional<blif2verilog::Token> expectOperator(const string &name = string());
   vector<blif2verilog::Token>::iterator mCurrentToken;
