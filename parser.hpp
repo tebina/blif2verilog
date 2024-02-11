@@ -3,38 +3,37 @@
 #include <map>
 #include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace simpleParser {
-
-using namespace std;
 
 enum BUILTIN_KEYWORDS { MODEL, INPUTS, OUTPUTS, GATE, END };
 
 class Type {
 public:
-  Type(const string &name = "", enum BUILTIN_KEYWORDS type = MODEL)
-      : mName(name), mType(type){};
-  string mName;
+  explicit Type(std::string name = "", enum BUILTIN_KEYWORDS type = MODEL)
+      : mName(std::move(name)), mType(type){};
+  std::string mName;
   enum BUILTIN_KEYWORDS mType;
-  vector<Type> mField;
+  std::vector<Type> mField;
 };
 
 class Parser {
 public:
   Parser();
-  void parse(vector<blif2verilog::Token> &tokens);
+  void parse(std::vector<tokenize::Token> &tokens);
 
 private:
-  optional<Type> expectType();
+    [[maybe_unused]] std::optional<Type> expectType();
   bool expectModelDefinition();
   bool expectInputsDefinition();
   bool expectOutputsDefinition();
-  optional<blif2verilog::Token> expectIdentifier(const string &name = string());
-  optional<blif2verilog::Token> expectOperator(const string &name = string());
-  vector<blif2verilog::Token>::iterator mCurrentToken;
-  vector<blif2verilog::Token>::iterator mEndToken;
-  map<string, Type> mTypes;
+  std::optional<tokenize::Token> expectIdentifier(const std::string &name = std::string());
+  std::optional<tokenize::Token> expectOperator(const std::string &name = std::string());
+  std::vector<tokenize::Token>::iterator mCurrentToken;
+  std::vector<tokenize::Token>::iterator mEndToken;
+  std::map<std::string, Type> mTypes;
 };
 
 } // namespace simpleParser

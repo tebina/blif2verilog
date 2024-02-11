@@ -4,9 +4,8 @@
 #include <string>
 #include <vector>
 
-namespace blif2verilog {
 
-using namespace std;
+namespace tokenize {
 
 enum TokenType {
   WHITESPACE,
@@ -25,7 +24,7 @@ static const char *sTokenTypeStrings[] = {
 class Token {
 public:
   enum TokenType mType { WHITESPACE };
-  string mText{0};
+  std::string mText;
   size_t mLineNumber{0};
 
   void debugPrint() const;
@@ -35,10 +34,10 @@ private:
 
 class Tokenizer {
 public:
-  vector<Token> parse(const string &inProgram);
+  static std::vector<Token> parse(const std::string &inProgram);
 
 private:
-  void endToken(Token &token, vector<Token> &tokens);
+  static void endToken(Token &token, std::vector<Token> &tokens);
 };
 
-} // namespace blif2verilog
+} // namespace tokenize

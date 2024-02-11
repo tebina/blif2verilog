@@ -4,11 +4,11 @@
 #include <string>
 #include <vector>
 
-namespace blif2verilog {
+
 
 using namespace std;
 
-vector<Token> Tokenizer::parse(const string &inProgram) {
+vector<tokenize::Token> tokenize::Tokenizer::parse(const string &inProgram) {
   vector<Token> tokens;
   Token currentToken;
   currentToken.mLineNumber = 1;
@@ -32,7 +32,6 @@ vector<Token> Tokenizer::parse(const string &inProgram) {
         throw runtime_error(string("Unknown escape sequence: \\") +
                             string(1, currCh) + " in string on line" +
                             to_string(currentToken.mLineNumber) + ".");
-        break;
       }
       currentToken.mType = STRING_LITERAL;
       continue;
@@ -86,8 +85,8 @@ vector<Token> Tokenizer::parse(const string &inProgram) {
         endToken(currentToken, tokens);
         currentToken.mType = STRING_LITERAL;
         currentToken.mText.append(1, currCh);
-      } else if (currentToken.mType == STRING_LITERAL) {
-        endToken(currentToken, tokens);
+      } else {
+          endToken(currentToken, tokens);
       }
       break;
     case '\\':
@@ -126,7 +125,7 @@ vector<Token> Tokenizer::parse(const string &inProgram) {
   return tokens;
 }
 
-void Tokenizer::endToken(Token &token, vector<Token> &tokens) {
+void tokenize::Tokenizer::endToken(Token &token, vector<Token> &tokens) {
   if (token.mType == COMMENT) {
     cout << "Comment found " << token.mText << endl;
   }
@@ -138,9 +137,7 @@ void Tokenizer::endToken(Token &token, vector<Token> &tokens) {
   token.mText.erase();
 }
 
-void Token::debugPrint() const {
+void tokenize::Token::debugPrint() const {
   cout << "Token(" << sTokenTypeStrings[mType] << ", \"" << mText << "\", "
        << mLineNumber << ")" << endl;
 }
-
-} // namespace blif2verilog

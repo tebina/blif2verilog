@@ -1,17 +1,15 @@
-#include "parser.cpp"
 #include "parser.hpp"
-#include "tokenizer.cpp"
+#include "tokenizer.hpp"
 #include <cstdio>
 #include <iostream>
 #include <ostream>
 
 using namespace std;
-using namespace blif2verilog;
 
 int main(int argc, char *argv[]) {
   cout << "simple parser start " << endl;
 
-  FILE *fh = fopen("example.blif", "r");
+  FILE *fh = fopen("C:\\Users\\tebin\\CLionProjects\\blif2verilog\\example.blif", "r");
   if (!fh) {
     cerr << "Couldn't open file for some reason" << endl;
   }
@@ -26,13 +24,13 @@ int main(int argc, char *argv[]) {
 
   cout << fileContents << endl;
 
-  Tokenizer tokenizer;
-  vector<Token> tokens = tokenizer.parse(fileContents);
+  //tokenize::Tokenizer tokenizer;
+  vector<tokenize::Token> tokens = tokenize::Tokenizer::parse(fileContents);
 
-  for (Token currToken : tokens) {
+  for (const tokenize::Token& currToken : tokens) {
     currToken.debugPrint();
   }
-  Parser parser;
+  simpleParser::Parser parser;
   parser.parse(tokens);
 
   return 0;

@@ -1,139 +1,147 @@
 #include "parser.hpp"
-#include "tokenizer.hpp"
+//#include "tokenizer.hpp"
 #include <iostream>
 #include <optional>
 #include <vector>
 
-using namespace simpleParser;
 using namespace std;
 
-bool Parser::expectModelDefinition() {
-  optional<blif2verilog::Token> possibleOperator = expectOperator(".");
-  if (possibleOperator.has_value()) { // Operator found !
-    optional<blif2verilog::Token> possibleIdentifier =
-        expectIdentifier("model");
-    if (possibleIdentifier.has_value()) {
-      cout << "We have a model : " << possibleIdentifier->mText << endl;
-      return true;
-    } else {
-      --mCurrentToken;
+bool simpleParser::Parser::expectModelDefinition() {
+
+    auto parseStart = mCurrentToken;
+    optional<tokenize::Token> possibleOperator = expectOperator(".");
+    if (possibleOperator.has_value()) { // Operator found !
+        optional<tokenize::Token> possibleIdentifier =
+                expectIdentifier("model");
+        if (possibleIdentifier.has_value()) {
+            optional<tokenize::Token> possibleModelName = expectIdentifier();
+            if (possibleModelName.has_value()) {
+                cout << "We have a model name: " << possibleModelName->mText << endl;
+                return true;
+
+            } else {
+                mCurrentToken = parseStart;
+            }
+        } else {
+            mCurrentToken = parseStart;
+        }
     }
-  } else {
-    --mCurrentToken;
-  }
-  return false;
+    return false;
 }
 
-bool Parser::expectInputsDefinition() {
-  optional<blif2verilog::Token> possibleOperator = expectOperator(".");
-  if (possibleOperator.has_value()) { // Operator found !
-    optional<blif2verilog::Token> possibleIdentifier =
-        expectIdentifier("inputs");
-    if (possibleIdentifier.has_value()) {
-      cout << "We have inputs : " << possibleIdentifier->mText << endl;
-      return true;
+bool simpleParser::Parser::expectInputsDefinition() {
+    auto parseStart = mCurrentToken;
+    optional<tokenize::Token> possibleOperator = expectOperator(".");
+    if (possibleOperator.has_value()) { // Operator found !
+        optional<tokenize::Token> possibleIdentifier =
+                expectIdentifier("inputs");
+        if (possibleIdentifier.has_value()) {
+            optional<tokenize::Token> possibleModelName = expectIdentifier();
+            if (possibleModelName.has_value()) {
+                cout << "We have inputs name: " << possibleModelName->mText << endl;
+                return true;
+        } else {
+            mCurrentToken = parseStart;
+        }
     } else {
-      --mCurrentToken;
+        mCurrentToken = parseStart;
+    }}
+    return false;
+}
+
+bool simpleParser::Parser::expectOutputsDefinition() {
+    auto parseStart = mCurrentToken;
+    optional<tokenize::Token> possibleOperator = expectOperator(".");
+    if (possibleOperator.has_value()) { // Operator found !
+        optional<tokenize::Token> possibleIdentifier =
+                expectIdentifier("outputs");
+        if (possibleIdentifier.has_value()) {
+            optional<tokenize::Token> possibleModelName = expectIdentifier();
+            if (possibleModelName.has_value()) {
+                cout << "We have outputs name: " << possibleModelName->mText << endl;
+                return true;
+            } else {
+                mCurrentToken = parseStart;
+            }
+        } else {
+            mCurrentToken = parseStart;
+        }}
+    return false;
+}
+
+void simpleParser::Parser::parse(vector<tokenize::Token> &tokens) {
+    mEndToken = tokens.end();
+    mCurrentToken = tokens.begin();
+
+    while (mCurrentToken != mEndToken) {
+        if (expectModelDefinition()) {
+
+        } else {
+            cerr << "Unknown identifier " << mCurrentToken->mText << "." << endl;
+            ++mCurrentToken;
+        }
+
+        if (expectInputsDefinition()) {
+
+        } else {
+            cerr << "Unknown identifier " << mCurrentToken->mText << "." << endl;
+            ++mCurrentToken;
+        }
+
+        if (expectOutputsDefinition()) {
+        } else {
+            cerr << "Unknown identifier " << mCurrentToken->mText << "." << endl;
+            ++mCurrentToken;
+        }
+
     }
-  } else {
-    --mCurrentToken;
-  }
-  return false;
 }
 
-bool Parser::expectOutputsDefinition() {
-  optional<blif2verilog::Token> possibleOperator = expectOperator(".");
-  if (possibleOperator.has_value()) { // Operator found !
-    optional<blif2verilog::Token> possibleIdentifier =
-        expectIdentifier("outputs");
-    if (possibleIdentifier.has_value()) {
-      cout << "We have outputs : " << possibleIdentifier->mText << endl;
-      return true;
-    } else {
-      --mCurrentToken;
+optional<tokenize::Token> simpleParser::Parser::expectIdentifier(const string &name) {
+    if (mCurrentToken == mEndToken) { return nullopt; }
+    if (mCurrentToken->mType != tokenize::IDENTIFIER) { return nullopt; }
+    if (!name.empty() && mCurrentToken->mText != name) { return nullopt; }
+
+    tokenize::Token returnToken = *mCurrentToken;
+    ++mCurrentToken;
+    return returnToken;
+}
+
+optional<tokenize::Token> simpleParser::Parser::expectOperator(const string &name) {
+    if (mCurrentToken == mEndToken) {
+        return nullopt;
     }
-  } else {
-    --mCurrentToken;
-  }
-  return false;
-}
-
-void Parser::parse(vector<blif2verilog::Token> &tokens) {
-  mEndToken = tokens.end();
-  mCurrentToken = tokens.begin();
-
-  while (mCurrentToken != mEndToken) {
-    if (expectModelDefinition()) {
-    } else {
-      cerr << "Uknown identifier " << mCurrentToken->mText << "." << endl;
-      ++mCurrentToken;
+    if (mCurrentToken->mType != tokenize::OPERATOR) {
+        return nullopt;
+    }
+    if (name.empty() || mCurrentToken->mText != name) {
+        return nullopt;
     }
 
-    if (expectInputsDefinition()) {
-    } else {
-      cerr << "Uknown identifier " << mCurrentToken->mText << "." << endl;
-      ++mCurrentToken;
+    tokenize::Token returnToken = *mCurrentToken;
+    ++mCurrentToken;
+    return returnToken;
+}
+
+simpleParser::Parser::Parser() {
+    mTypes["model"] = Type("model", MODEL);
+    mTypes["inputs"] = Type("inputs", INPUTS);
+    mTypes["outputs"] = Type("outputs", OUTPUTS);
+    mTypes["gate"] = Type("gate", GATE);
+    mTypes["end"] = Type("end", END);
+}
+
+[[maybe_unused]] optional<simpleParser::Type> simpleParser::Parser::expectType() {
+    optional<tokenize::Token> possibleType = expectIdentifier();
+    if (!possibleType) {
+        return nullopt;
     }
 
-    if (expectOutputsDefinition()) {
-    } else {
-      cerr << "Uknown identifier " << mCurrentToken->mText << "." << endl;
-      ++mCurrentToken;
+    auto foundType = mTypes.find(possibleType->mText);
+    if (foundType == mTypes.end()) {
+        --mCurrentToken;
+        return nullopt;
     }
-  }
-}
 
-optional<blif2verilog::Token> Parser::expectIdentifier(const string &name) {
-  if (mCurrentToken == mEndToken) {
-    return nullopt;
-  }
-  if (mCurrentToken->mType != blif2verilog::IDENTIFIER) {
-    return nullopt;
-  }
-  if (name.empty() || mCurrentToken->mText != name) {
-    return nullopt;
-  }
-
-  blif2verilog::Token returnToken = *mCurrentToken;
-  ++mCurrentToken;
-  return returnToken;
-}
-
-optional<blif2verilog::Token> Parser::expectOperator(const string &name) {
-  if (mCurrentToken == mEndToken) {
-    return nullopt;
-  }
-  if (mCurrentToken->mType != blif2verilog::OPERATOR) {
-    return nullopt;
-  }
-  if (name.empty() || mCurrentToken->mText != name) {
-    return nullopt;
-  }
-
-  blif2verilog::Token returnToken = *mCurrentToken;
-  ++mCurrentToken;
-  return returnToken;
-}
-
-Parser::Parser() {
-  mTypes["model"] = Type("model", MODEL);
-  mTypes["inputs"] = Type("inputs", INPUTS);
-  mTypes["outputs"] = Type("outputs", OUTPUTS);
-  mTypes["gate"] = Type("gate", GATE);
-  mTypes["end"] = Type("end", END);
-}
-
-optional<Type> Parser::expectType() {
-  optional<blif2verilog::Token> possibleType = expectIdentifier();
-  if (!possibleType) {
-    return nullopt;
-  }
-
-  map<string, Type>::iterator foundType = mTypes.find(possibleType->mText);
-  if (foundType == mTypes.end()) {
-    //--mCurrentToken;
-    return nullopt;
-  }
-
-  return foundType->second;
+    return foundType->second;
 }
