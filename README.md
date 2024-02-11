@@ -1,2 +1,2 @@
-# blif2verilog
+# tokenize
 Simple blif to verilog converter in C++
