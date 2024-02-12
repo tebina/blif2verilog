@@ -69,6 +69,26 @@ bool simpleParser::Parser::expectOutputsDefinition() {
     return false;
 }
 
+bool simpleParser::Parser::expectGateDefinition() {
+    auto parseStart = mCurrentToken;
+    optional<tokenize::Token> possibleOperator = expectOperator(".");
+    if (possibleOperator.has_value()) { // Operator found !
+        optional<tokenize::Token> possibleIdentifier =
+                expectIdentifier("gate");
+        if (possibleIdentifier.has_value()) {
+            optional<tokenize::Token> possibleModelName = expectIdentifier();
+            if (possibleModelName.has_value()) {
+                cout << "We have a gate name: " << possibleModelName->mText << endl;
+                return true;
+            } else {
+                mCurrentToken = parseStart;
+            }
+        } else {
+            mCurrentToken = parseStart;
+        }}
+    return false;
+}
+
 void simpleParser::Parser::parse(vector<tokenize::Token> &tokens) {
     mEndToken = tokens.end();
     mCurrentToken = tokens.begin();
@@ -94,6 +114,11 @@ void simpleParser::Parser::parse(vector<tokenize::Token> &tokens) {
             ++mCurrentToken;
         }
 
+        if (expectGateDefinition()) {
+        } else {
+            cerr << "Unknown identifier " << mCurrentToken->mText << "." << endl;
+            ++mCurrentToken;
+        }
     }
 }
 

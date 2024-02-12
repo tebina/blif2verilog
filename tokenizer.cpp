@@ -76,10 +76,18 @@ vector<tokenize::Token> tokenize::Tokenizer::parse(const string &inProgram) {
       ++currentToken.mLineNumber;
       break;
     case '\r':
-    case '\n':
+    //case '\n':
       endToken(currentToken, tokens);
       ++currentToken.mLineNumber;
       break;
+        case '\n':
+            if (currentToken.mType != STRING_LITERAL) {
+                currentToken.mType = BACK_TO_LINE;
+                currentToken.mText.append(1, currCh);
+            } else {
+                currentToken.mText.append(1, currCh);
+            }
+            break;
     case '"':
       if (currentToken.mType != STRING_LITERAL) {
         endToken(currentToken, tokens);

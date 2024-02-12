@@ -29,6 +29,7 @@ private:
   bool expectModelDefinition();
   bool expectInputsDefinition();
   bool expectOutputsDefinition();
+  bool expectGateDefinition();
   std::optional<tokenize::Token> expectIdentifier(const std::string &name = std::string());
   std::optional<tokenize::Token> expectOperator(const std::string &name = std::string());
   std::vector<tokenize::Token>::iterator mCurrentToken;

@@ -14,12 +14,13 @@ enum TokenType {
   STRING_LITERAL,
   OPERATOR,
   COMMENT,
-  STRING_ESCAPE_SEQUENCE
+  STRING_ESCAPE_SEQUENCE,
+  BACK_TO_LINE
 };
 
 static const char *sTokenTypeStrings[] = {
     "WHITESPACE", "IDENTIFIER", "INTEGER_LITERAL",       "STRING_LITERAL",
-    "OPERATOR",   "COMMENT",    "STRING_ESCAPE_SEQUENCE"};
+    "OPERATOR",   "COMMENT",    "STRING_ESCAPE_SEQUENCE", "BACK_TO_LINE"};
 
 class Token {
 public:
