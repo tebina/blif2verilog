@@ -61,7 +61,7 @@ vector<tokenize::Token> tokenize::Tokenizer::parse(const string &inProgram) {
     case ':':
     case ';':
     case '.':
-      if (currentToken.mType != STRING_LITERAL) {
+      if (currentToken.mType != STRING_LITERAL && currentToken.mType != COMMENT) {
         endToken(currentToken, tokens);
         currentToken.mType = OPERATOR;
         currentToken.mText.append(1, currCh);
@@ -72,22 +72,18 @@ vector<tokenize::Token> tokenize::Tokenizer::parse(const string &inProgram) {
       break;
     case ' ':
     case '\t':
-      endToken(currentToken, tokens);
-      ++currentToken.mLineNumber;
-      break;
-    case '\r':
-    //case '\n':
-      endToken(currentToken, tokens);
-      ++currentToken.mLineNumber;
-      break;
-        case '\n':
-            if (currentToken.mType != STRING_LITERAL) {
-                currentToken.mType = BACK_TO_LINE;
-                currentToken.mText.append(1, currCh);
-            } else {
-                currentToken.mText.append(1, currCh);
-            }
+        if (currentToken.mType == STRING_LITERAL || currentToken.mType == COMMENT) {
+            currentToken.mText.append(1, currCh);
+        } else {
+            endToken(currentToken, tokens);
+        }
             break;
+    case '\r':
+    case '\n':
+      endToken(currentToken, tokens);
+      ++currentToken.mLineNumber;
+      break;
+
     case '"':
       if (currentToken.mType != STRING_LITERAL) {
         endToken(currentToken, tokens);
@@ -109,13 +105,11 @@ vector<tokenize::Token> tokenize::Tokenizer::parse(const string &inProgram) {
       }
       break;
     case '#':
-      if (currentToken.mType == STRING_LITERAL) {
+
         endToken(currentToken, tokens);
         currentToken.mType = COMMENT;
         currentToken.mText.append(1, currCh);
-      } else {
-        endToken(currentToken, tokens);
-      }
+
       break;
     default:
       if (currentToken.mType == WHITESPACE ||
@@ -136,6 +130,8 @@ vector<tokenize::Token> tokenize::Tokenizer::parse(const string &inProgram) {
 void tokenize::Tokenizer::endToken(Token &token, vector<Token> &tokens) {
   if (token.mType == COMMENT) {
     cout << "Comment found " << token.mText << endl;
+    token.mType = WHITESPACE;
+    token.mText.erase();
   }
 
   if (token.mType != WHITESPACE) {

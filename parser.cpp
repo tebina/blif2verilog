@@ -1,5 +1,4 @@
 #include "parser.hpp"
-//#include "tokenizer.hpp"
 #include <iostream>
 #include <optional>
 #include <vector>
@@ -97,26 +96,26 @@ void simpleParser::Parser::parse(vector<tokenize::Token> &tokens) {
         if (expectModelDefinition()) {
 
         } else {
-            cerr << "Unknown identifier " << mCurrentToken->mText << "." << endl;
+            cerr << "Unknown identifier " << mCurrentToken->mText << endl;
             ++mCurrentToken;
         }
 
         if (expectInputsDefinition()) {
 
         } else {
-            cerr << "Unknown identifier " << mCurrentToken->mText << "." << endl;
+            cerr << "Unknown identifier " << mCurrentToken->mText << endl;
             ++mCurrentToken;
         }
 
         if (expectOutputsDefinition()) {
         } else {
-            cerr << "Unknown identifier " << mCurrentToken->mText << "." << endl;
+            cerr << "Unknown identifier " << mCurrentToken->mText << endl;
             ++mCurrentToken;
         }
 
         if (expectGateDefinition()) {
         } else {
-            cerr << "Unknown identifier " << mCurrentToken->mText << "." << endl;
+            cerr << "Unknown identifier " << mCurrentToken->mText << endl;
             ++mCurrentToken;
         }
     }
