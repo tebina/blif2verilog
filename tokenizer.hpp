@@ -19,8 +19,8 @@ enum TokenType {
 };
 
 static const char *sTokenTypeStrings[] = {
-    "WHITESPACE", "IDENTIFIER", "INTEGER_LITERAL",       "STRING_LITERAL",
-    "OPERATOR",   "COMMENT",    "STRING_ESCAPE_SEQUENCE", "BACK_TO_LINE"};
+    "WHITESPACE", "IDENTIFIER",       "STRING_LITERAL",
+    "OPERATOR",   "COMMENT",    "STRING_ESCAPE_SEQUENCE"};
 
 class Token {
 public:

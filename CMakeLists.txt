@@ -9,7 +9,8 @@ add_library( blif2verilog_internals
         tokenizer.cpp
         tokenizer.hpp
         parser.cpp
-        parser.hpp)
+        parser.hpp
+        blifDefinition.hpp)
 
 add_executable(blif2verilog main.cpp)
 
