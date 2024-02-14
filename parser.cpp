@@ -107,7 +107,6 @@ bool simpleParser::Parser::expectGateDefinition() {
         if (possibleGateIdentifier.has_value()) {
             optional<tokenize::Token> possibleModelName = expectIdentifier();
             if (possibleModelName.has_value()) {
-                //cout << "We have a gate name: " << possibleModelName->mText << endl;
                 gate.mName = possibleModelName->mText;
                 while (!expectOperator(".")) {
                     gateNetsDefinition nets;
@@ -129,8 +128,8 @@ bool simpleParser::Parser::expectGateDefinition() {
                     }
                 }
                 cout << "found gate : " << gate.mName << ". ";
-                cout << "with the following nets : " ;
-                for (auto & mPin : gate.mPins) {
+                cout << "with the following nets : ";
+                for (auto &mPin: gate.mPins) {
                     cout << mPin.mName << " = " << mPin.mPin << " ";
                 }
                 cout << endl;
@@ -169,33 +168,9 @@ void simpleParser::Parser::parse(vector<tokenize::Token> &tokens) {
     mCurrentToken = tokens.begin();
 
     while (mCurrentToken != mEndToken) {
-        if (expectModelDefinition()) {
+        if (expectModelDefinition() || expectInputsDefinition() || expectOutputsDefinition() ||
+            expectGateDefinition() || expectEndModule()) {
 
-        } else {
-            cerr << "Unknown identifier " << mCurrentToken->mText << endl;
-            ++mCurrentToken;
-        }
-
-        if (expectInputsDefinition()) {
-
-        } else {
-            cerr << "Unknown identifier " << mCurrentToken->mText << endl;
-            ++mCurrentToken;
-        }
-
-        if (expectOutputsDefinition()) {
-        } else {
-            cerr << "Unknown identifier " << mCurrentToken->mText << endl;
-            ++mCurrentToken;
-        }
-
-        if (expectGateDefinition()) {
-        } else {
-            cerr << "Unknown identifier " << mCurrentToken->mText << endl;
-            ++mCurrentToken;
-        }
-
-        if (expectEndModule()) {
         } else {
             cerr << "Unknown identifier " << mCurrentToken->mText << endl;
             ++mCurrentToken;

@@ -9,7 +9,7 @@ using namespace std;
 int main(int argc, char *argv[]) {
   cout << "simple parser start " << endl;
 
-  FILE *fh = fopen("../example.blif", "r");
+  FILE *fh = fopen("../example2.blif", "r");
   if (!fh) {
     cerr << "Couldn't open file for some reason" << endl;
   }
@@ -27,9 +27,9 @@ int main(int argc, char *argv[]) {
   //tokenize::Tokenizer tokenizer;
   vector<tokenize::Token> tokens = tokenize::Tokenizer::parse(fileContents);
 
-  for (const tokenize::Token& currToken : tokens) {
-    currToken.debugPrint();
-  }
+//  for (const tokenize::Token& currToken : tokens) {
+//    currToken.debugPrint();
+//  }
   simpleParser::Parser parser;
   parser.parse(tokens);
 
