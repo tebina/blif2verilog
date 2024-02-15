@@ -7,9 +7,9 @@
 using namespace std;
 
 int main(int argc, char *argv[]) {
-  cout << "simple parser start " << endl;
+  cout << "Blif Parser Start :" << endl;
 
-  FILE *fh = fopen("../example2.blif", "r");
+  FILE *fh = fopen("../example.blif", "r");
   if (!fh) {
     cerr << "Couldn't open file for some reason" << endl;
   }
@@ -22,16 +22,17 @@ int main(int argc, char *argv[]) {
   string fileContents(file_size, ' ');
   fread(fileContents.data(), 1, file_size, fh);
 
-  cout << fileContents << endl;
+  //Uncomment to pring file contents
+  //cout << fileContents << endl;
 
   //tokenize::Tokenizer tokenizer;
   vector<tokenize::Token> tokens = tokenize::Tokenizer::parse(fileContents);
 
+  //uncomment to print all tokens
 //  for (const tokenize::Token& currToken : tokens) {
 //    currToken.debugPrint();
 //  }
   simpleParser::Parser parser;
   parser.parse(tokens);
 
-  return 0;
 }

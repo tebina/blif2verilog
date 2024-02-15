@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Type.hpp"
-
 
 namespace simpleParser {
     using namespace std;
@@ -11,25 +9,11 @@ namespace simpleParser {
         string mName;
     };
 
-    class inputDefinition {
+    class ioDefinition {
     public:
         string mName;
     };
 
-    class manyInputDefinition {
-    public:
-        vector<inputDefinition> mName;
-    };
-
-    class outputDefinition {
-    public:
-        string mName;
-    };
-
-    class manyOutputDefinition {
-    public:
-        vector<outputDefinition> mName;
-    };
 
     class gateNetsDefinition {
     public:
@@ -43,4 +27,14 @@ namespace simpleParser {
         vector<gateNetsDefinition> mPins;
     };
 
+
+    class netlistDefiniton {
+    public:
+        // Vector to hold input definitions
+        modelDefinition modelName;
+        vector<ioDefinition> inputs;
+        vector<ioDefinition> outputs;
+        vector<gateDefinition> gates;
+
+    };
 } // simpleParser

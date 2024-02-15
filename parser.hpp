@@ -1,7 +1,6 @@
 #pragma once
 
 #include "tokenizer.hpp"
-#include "Type.hpp"
 #include "blifDefinition.hpp"
 
 #include <map>
@@ -14,22 +13,19 @@ namespace simpleParser {
 
     class Parser {
     public:
-        Parser();
+        Parser()= default;
 
         void parse(std::vector<tokenize::Token> &tokens);
 
     private:
-        [[maybe_unused]] std::optional<Type> expectType();
 
-        bool expectModelDefinition();
+        std::tuple<bool, simpleParser::modelDefinition> expectModelDefinition();
 
-        bool expectInputsDefinition();
+        std::tuple<bool, vector<simpleParser::ioDefinition>> expectInputsDefinition();
 
-        bool expectOutputsDefinition();
+        std::tuple<bool, vector<simpleParser::ioDefinition>> expectOutputsDefinition();
 
-        //bool expectGateNetsDefinition();
-
-        bool expectGateDefinition();
+        std::tuple<bool, simpleParser::gateDefinition> expectGateDefinition();
 
         bool expectEndModule();
 
@@ -40,7 +36,6 @@ namespace simpleParser {
 
         std::vector<tokenize::Token>::iterator mCurrentToken;
         std::vector<tokenize::Token>::iterator mEndToken;
-        std::map<std::string, Type> mTypes;
 
     };
 

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 3.20)
 project(blif2verilog)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -12,6 +12,7 @@ add_library( blif2verilog_internals
         parser.hpp
         blifDefinition.hpp)
 
-add_executable(blif2verilog main.cpp)
+add_executable(blif2verilog main.cpp
+)
 
 target_link_libraries(blif2verilog blif2verilog_internals)
