@@ -129,7 +129,7 @@ vector<tokenize::Token> tokenize::Tokenizer::parse(const string &inProgram) {
 
 void tokenize::Tokenizer::endToken(Token &token, vector<Token> &tokens) {
   if (token.mType == COMMENT) {
-    cout << "Comment found " << token.mText << endl;
+    //cout << "Comment found " << token.mText << endl;
     token.mType = WHITESPACE;
     token.mText.erase();
   }

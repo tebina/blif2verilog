@@ -4,6 +4,7 @@
 #include <optional>
 #include <vector>
 
+
 using namespace std;
 
 tuple<bool, simpleParser::modelDefinition> simpleParser::Parser::expectModelDefinition() {
@@ -154,7 +155,7 @@ bool simpleParser::Parser::expectEndModule() {
 }
 
 
-void simpleParser::Parser::parse(vector<tokenize::Token> &tokens) {
+simpleParser::netlistDefiniton simpleParser::Parser::parse(vector<tokenize::Token> &tokens) {
     mEndToken = tokens.end();
     mCurrentToken = tokens.begin();
     netlistDefiniton netlistObject;
@@ -189,32 +190,34 @@ void simpleParser::Parser::parse(vector<tokenize::Token> &tokens) {
             ++mCurrentToken;
         }
     }
-    cout << "Found model name : " << netlistObject.modelName.mName << endl;
-    cout << "The lenght of inputs vector is : " << netlistObject.inputs.size() << endl;
-    cout << "The lenght of outputs vector is : " << netlistObject.outputs.size() << endl;
+//    cout << "Found model name : " << netlistObject.modelName.mName << endl;
+//    cout << "The lenght of inputs vector is : " << netlistObject.inputs.size() << endl;
+//    cout << "The lenght of outputs vector is : " << netlistObject.outputs.size() << endl;
+//
+//    cout << "Found the following inputs : ";
+//    for (auto &input: netlistObject.inputs) {
+//        cout << input.mName << " ";
+//    }
+//    cout << endl;
+//
+//    cout << "Found the following outputs : ";
+//    for (auto &output: netlistObject.outputs) {
+//        cout << output.mName << " ";
+//    }
+//    cout << endl;
+//
+//    cout << "Found the following gates : " << endl;
+//    for (auto &gate: netlistObject.gates) {
+//        cout << "found gate : " << gate.mName << " ";
+//        cout << "with the following nets : ";
+//        for (auto &mPin: gate.mPins) {
+//            cout << mPin.mName << " = " << mPin.mPin << " ";
+//        }
+//        cout << endl;
+//    }
+//    cout << endl;
 
-    cout << "Found the following inputs : ";
-    for (auto &input: netlistObject.inputs) {
-        cout << input.mName << " ";
-    }
-    cout << endl;
-
-    cout << "Found the following outputs : ";
-    for (auto &output: netlistObject.outputs) {
-        cout << output.mName << " ";
-    }
-    cout << endl;
-
-    cout << "Found the following gates : " << endl;
-    for (auto &gate: netlistObject.gates) {
-        cout << "found gate : " << gate.mName << " ";
-        cout << "with the following nets : ";
-        for (auto &mPin: gate.mPins) {
-            cout << mPin.mName << " = " << mPin.mPin << " ";
-        }
-        cout << endl;
-    }
-    cout << endl;
+    return netlistObject;
 }
 
 optional<tokenize::Token> simpleParser::Parser::expectIdentifier(const string &name) {

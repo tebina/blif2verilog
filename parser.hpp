@@ -15,7 +15,7 @@ namespace simpleParser {
     public:
         Parser()= default;
 
-        void parse(std::vector<tokenize::Token> &tokens);
+        simpleParser::netlistDefiniton parse(std::vector<tokenize::Token> &tokens);
 
     private:
 

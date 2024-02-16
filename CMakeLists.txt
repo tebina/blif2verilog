@@ -5,14 +5,17 @@ set(CMAKE_CXX_STANDARD 20)
 
 include_directories(.)
 
+
 add_library( blif2verilog_internals
         tokenizer.cpp
         tokenizer.hpp
         parser.cpp
         parser.hpp
-        blifDefinition.hpp)
-
-add_executable(blif2verilog main.cpp
+        blifDefinition.hpp
+        codeGenerator.cpp
+        codeGenerator.hpp
 )
+
+add_executable(blif2verilog main.cpp)
 
 target_link_libraries(blif2verilog blif2verilog_internals)
