@@ -1,12 +1,11 @@
 #include "parser.hpp"
 #include "tokenizer.hpp"
 #include "codeGenerator.hpp"
-
-#include <cstdio>
 #include <iostream>
+#include <fstream>
+#include <cstdio>
 #include <memory>
 #include <ostream>
-#include <memory>
 
 using namespace std;
 
@@ -50,8 +49,19 @@ int main(int argc, char *argv[]) {
     // Assign the netlist object to the unique pointer
     netlist_ptr = std::make_unique<simpleParser::netlistDefiniton>(netlist_object);
 
-    codeGenerator::generateVerilog(netlist_ptr);
+    std::string verilogText  = codeGenerator::generateVerilog(netlist_ptr);
 
+
+
+    // Write Verilog text to a file
+    std::ofstream outputFile("example.v");
+    if (outputFile.is_open()) {
+        outputFile << verilogText;
+        outputFile.close();
+        std::cout << "Verilog file generated successfully!\n";
+    } else {
+        std::cerr << "Unable to open file for writing!\n";
+    }
 //    Jinja2CppLight::Template mytemplate( R"d(
 //        This is my {{avalue}} template.  It's {{secondvalue}}...
 //        Today's weather is {{weather}}.

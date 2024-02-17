@@ -5,6 +5,6 @@
 
 class codeGenerator {
 public:
-    static void generateVerilog(std::unique_ptr<simpleParser::netlistDefiniton>& netlist_ptr);
+    static std::string generateVerilog(std::unique_ptr<simpleParser::netlistDefiniton>& netlist_ptr);
 
 };
