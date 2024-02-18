@@ -12,12 +12,12 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
     if (argc < 2 || argc > 3) {
-        cerr << "Usage: " << argv[0] << " file.blif [generated.v]" << endl;
+        cerr << "Usage: " << "./blif2verilog" << " file.blif [generated.v]" << endl;
         return 1;
     }
 
     const char* blifFileName = argv[1];
-    const char* verilogFileName = (argc == 3) ? argv[2] : "file.v";
+    const char* verilogFileName = (argc == 3) ? argv[2] : "generated.v";
 
     cout << "Blif Parser Start..." << endl;
 
