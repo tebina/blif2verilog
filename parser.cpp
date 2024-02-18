@@ -1,23 +1,26 @@
 #include "parser.hpp"
-//#include "tokenizer.hpp"
+#include "blifDefinition.hpp"
 #include <iostream>
 #include <optional>
 #include <vector>
 
+
 using namespace std;
 
-bool simpleParser::Parser::expectModelDefinition() {
+tuple<bool, simpleParser::modelDefinition> simpleParser::Parser::expectModelDefinition() {
 
     auto parseStart = mCurrentToken;
     optional<tokenize::Token> possibleOperator = expectOperator(".");
+    modelDefinition modelName;
     if (possibleOperator.has_value()) { // Operator found !
         optional<tokenize::Token> possibleIdentifier =
                 expectIdentifier("model");
         if (possibleIdentifier.has_value()) {
             optional<tokenize::Token> possibleModelName = expectIdentifier();
             if (possibleModelName.has_value()) {
-                cout << "We have a model name: " << possibleModelName->mText << endl;
-                return true;
+                modelName.mName = possibleModelName->mText;
+                //cout << "We have a model name: " << modelName.mName << endl;
+                return std::make_tuple(true, modelName);
 
             } else {
                 mCurrentToken = parseStart;
@@ -26,75 +29,195 @@ bool simpleParser::Parser::expectModelDefinition() {
             mCurrentToken = parseStart;
         }
     }
-    return false;
+    return std::make_tuple(false, modelName);
 }
 
-bool simpleParser::Parser::expectInputsDefinition() {
+tuple<bool, vector<simpleParser::ioDefinition>> simpleParser::Parser::expectInputsDefinition() {
     auto parseStart = mCurrentToken;
+    vector<ioDefinition> inputsVector;
     optional<tokenize::Token> possibleOperator = expectOperator(".");
-    if (possibleOperator.has_value()) { // Operator found !
+    if (possibleOperator.has_value()) {
         optional<tokenize::Token> possibleIdentifier =
                 expectIdentifier("inputs");
         if (possibleIdentifier.has_value()) {
-            optional<tokenize::Token> possibleModelName = expectIdentifier();
-            if (possibleModelName.has_value()) {
-                cout << "We have inputs name: " << possibleModelName->mText << endl;
-                return true;
+            while (!expectOperator(".")) {
+                ioDefinition input;
+                optional<tokenize::Token> possibleVariableName = expectIdentifier();
+                if (possibleVariableName.has_value()) {
+                    input.mName = possibleVariableName->mText;
+                    inputsVector.push_back(input);
+                }
+                if (expectOperator(".")) {
+                    --mCurrentToken;
+                    break;
+                }
+            }
+
+            return std::make_tuple(true, inputsVector);
         } else {
             mCurrentToken = parseStart;
         }
     } else {
         mCurrentToken = parseStart;
-    }}
-    return false;
+    }
+
+    return std::make_tuple(false, inputsVector);
 }
 
-bool simpleParser::Parser::expectOutputsDefinition() {
+tuple<bool, vector<simpleParser::ioDefinition>> simpleParser::Parser::expectOutputsDefinition() {
     auto parseStart = mCurrentToken;
+    vector<ioDefinition> outputsVector;
     optional<tokenize::Token> possibleOperator = expectOperator(".");
     if (possibleOperator.has_value()) { // Operator found !
         optional<tokenize::Token> possibleIdentifier =
                 expectIdentifier("outputs");
         if (possibleIdentifier.has_value()) {
+            while (!expectOperator(".")) {
+                optional<tokenize::Token> possibleVariableName = expectIdentifier();
+                if (possibleVariableName.has_value()) {
+                    ioDefinition output;
+                    output.mName = possibleVariableName->mText;
+                    outputsVector.push_back(output);
+                }
+                if (expectOperator(".")) {
+                    --mCurrentToken;
+                    break;
+                }
+            }
+            return std::make_tuple(true, outputsVector);
+        } else {
+            mCurrentToken = parseStart;
+        }
+    } else {
+        mCurrentToken = parseStart;
+    }
+
+    return std::make_tuple(false, outputsVector);
+}
+
+
+tuple<bool, simpleParser::gateDefinition> simpleParser::Parser::expectGateDefinition() {
+    auto parseStart = mCurrentToken;
+    gateDefinition gate;
+    optional<tokenize::Token> possibleDotOperator = expectOperator(".");
+    if (possibleDotOperator.has_value()) { // Operator found !
+        optional<tokenize::Token> possibleGateIdentifier =
+                expectIdentifier("gate");
+        if (possibleGateIdentifier.has_value()) {
             optional<tokenize::Token> possibleModelName = expectIdentifier();
             if (possibleModelName.has_value()) {
-                cout << "We have outputs name: " << possibleModelName->mText << endl;
-                return true;
+                gate.mName = possibleModelName->mText;
+                while (!expectOperator(".")) {
+                    gateNetsDefinition nets;
+                    optional<tokenize::Token> possibleIdentifier = expectIdentifier();
+                    if (possibleIdentifier.has_value()) {
+                        optional<tokenize::Token> possibleOperator = expectOperator("=");
+                        if (possibleOperator.has_value()) {
+                            optional<tokenize::Token> possibleNetName = expectIdentifier();
+                            if (possibleNetName.has_value()) {
+                                nets.mName = possibleIdentifier->mText;
+                                nets.mPin = possibleNetName->mText;
+                                gate.mPins.push_back(nets);
+                            }
+                        }
+                    }
+                    if (expectOperator(".")) {
+                        --mCurrentToken;
+                        break;
+                    }
+                }
+                return std::make_tuple(true, gate);
             } else {
                 mCurrentToken = parseStart;
             }
         } else {
             mCurrentToken = parseStart;
-        }}
+        }
+    }
+    return std::make_tuple(false, gate);
+}
+
+bool simpleParser::Parser::expectEndModule() {
+    auto parseStart = mCurrentToken;
+    optional<tokenize::Token> possibleOperator = expectOperator(".");
+    if (possibleOperator.has_value()) { // Operator found !
+        optional<tokenize::Token> possibleIdentifier =
+                expectIdentifier("end");
+        if (possibleIdentifier.has_value()) {
+            return true;
+        } else {
+            mCurrentToken = parseStart;
+        }
+    } else {
+        mCurrentToken = parseStart;
+    }
     return false;
 }
 
-void simpleParser::Parser::parse(vector<tokenize::Token> &tokens) {
+
+simpleParser::netlistDefiniton simpleParser::Parser::parse(vector<tokenize::Token> &tokens) {
     mEndToken = tokens.end();
     mCurrentToken = tokens.begin();
+    netlistDefiniton netlistObject;
+
 
     while (mCurrentToken != mEndToken) {
-        if (expectModelDefinition()) {
+        auto [foundModel, modelObj] = expectModelDefinition();
+        auto [foundInput, inputObj] = expectInputsDefinition();
+        auto [foundOutput, outputObj] = expectOutputsDefinition();
+        auto [foundGate, gateObj] = expectGateDefinition();
 
-        } else {
-            cerr << "Unknown identifier " << mCurrentToken->mText << "." << endl;
-            ++mCurrentToken;
+        if (foundModel) {
+            netlistObject.modelName = modelObj;
+        }
+        if (foundInput) {
+            netlistObject.inputs = inputObj;
+        }
+        if (foundOutput) {
+            netlistObject.outputs = outputObj;
+        }
+        if (foundGate) {
+            netlistObject.gates.push_back(gateObj);
+        }
+        if (expectEndModule()) {
+            //cout << "reached end of module ! " << endl;
+            //break; // Exit the loop when end of module is reached
         }
 
-        if (expectInputsDefinition()) {
-
-        } else {
-            cerr << "Unknown identifier " << mCurrentToken->mText << "." << endl;
+        if (!foundModel && !foundInput && !foundOutput && !foundGate && !expectEndModule()){
+            // Handle unknown identifier
+            cerr << "Unknown identifier " << mCurrentToken->mText << endl;
             ++mCurrentToken;
         }
-
-        if (expectOutputsDefinition()) {
-        } else {
-            cerr << "Unknown identifier " << mCurrentToken->mText << "." << endl;
-            ++mCurrentToken;
-        }
-
     }
+//    cout << "Found model name : " << netlistObject.modelName.mName << endl;
+//    cout << "The lenght of inputs vector is : " << netlistObject.inputs.size() << endl;
+//    cout << "The lenght of outputs vector is : " << netlistObject.outputs.size() << endl;
+//
+//    cout << "Found the following inputs : ";
+//    for (auto &input: netlistObject.inputs) {
+//        cout << input.mName << " ";
+//    }
+//    cout << endl;
+//
+//    cout << "Found the following outputs : ";
+//    for (auto &output: netlistObject.outputs) {
+//        cout << output.mName << " ";
+//    }
+//    cout << endl;
+//
+//    cout << "Found the following gates : " << endl;
+//    for (auto &gate: netlistObject.gates) {
+//        cout << "found gate : " << gate.mName << " ";
+//        cout << "with the following nets : ";
+//        for (auto &mPin: gate.mPins) {
+//            cout << mPin.mName << " = " << mPin.mPin << " ";
+//        }
+//        cout << endl;
+//    }
+//    cout << endl;
+
+    return netlistObject;
 }
 
 optional<tokenize::Token> simpleParser::Parser::expectIdentifier(const string &name) {
@@ -121,27 +244,4 @@ optional<tokenize::Token> simpleParser::Parser::expectOperator(const string &nam
     tokenize::Token returnToken = *mCurrentToken;
     ++mCurrentToken;
     return returnToken;
-}
-
-simpleParser::Parser::Parser() {
-    mTypes["model"] = Type("model", MODEL);
-    mTypes["inputs"] = Type("inputs", INPUTS);
-    mTypes["outputs"] = Type("outputs", OUTPUTS);
-    mTypes["gate"] = Type("gate", GATE);
-    mTypes["end"] = Type("end", END);
-}
-
-[[maybe_unused]] optional<simpleParser::Type> simpleParser::Parser::expectType() {
-    optional<tokenize::Token> possibleType = expectIdentifier();
-    if (!possibleType) {
-        return nullopt;
-    }
-
-    auto foundType = mTypes.find(possibleType->mText);
-    if (foundType == mTypes.end()) {
-        --mCurrentToken;
-        return nullopt;
-    }
-
-    return foundType->second;
 }

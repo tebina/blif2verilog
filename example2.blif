@@ -4,6 +4,16 @@
 
 # gate type: AND; name: GATE_0_I0
 .gate AND2X1 A=D_INPUT_6 B=INPUT_7 Y=GATE_0
+.gate OR2X1 A=D_INPUT_6 B=INPUT_7 Y=GATE_0
 
+# gate type: nAND; name: GATE_0_I0
+# gate type: FDDFAND; name: GATE_0_I0
+
+.gate NAND2X1 A=D_INPUT_6 B=INPUT_7 Y=GATE_0
+.gate NAND2X1 A=D_INPUT_6 B=INPUT_7 Y=GATE_0
+.gate NAND2X1 A=D_INPUT_6 B=INPUT_7 Y=GATE_0
+.gate NOR2X1 A=D_INPUT_6 B=INPUT_7 Y=GATE_0
+.gate AND2X1 A=D_INPUT_6 B=INPUT_7 Y=GATE_0
+.gate Zing A=D_INnnnPUT_6 B=aaaaINPUT_7 Y=GATE_0
 
 .end

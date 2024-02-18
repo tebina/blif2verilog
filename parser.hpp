@@ -1,5 +1,8 @@
 #pragma once
+
 #include "tokenizer.hpp"
+#include "blifDefinition.hpp"
+
 #include <map>
 #include <optional>
 #include <string>
@@ -8,32 +11,32 @@
 
 namespace simpleParser {
 
-enum BUILTIN_KEYWORDS { MODEL, INPUTS, OUTPUTS, GATE, END };
+    class Parser {
+    public:
+        Parser()= default;
 
-class Type {
-public:
-  explicit Type(std::string name = "", enum BUILTIN_KEYWORDS type = MODEL)
-      : mName(std::move(name)), mType(type){};
-  std::string mName;
-  enum BUILTIN_KEYWORDS mType;
-  std::vector<Type> mField;
-};
+        simpleParser::netlistDefiniton parse(std::vector<tokenize::Token> &tokens);
 
-class Parser {
-public:
-  Parser();
-  void parse(std::vector<tokenize::Token> &tokens);
+    private:
 
-private:
-    [[maybe_unused]] std::optional<Type> expectType();
-  bool expectModelDefinition();
-  bool expectInputsDefinition();
-  bool expectOutputsDefinition();
-  std::optional<tokenize::Token> expectIdentifier(const std::string &name = std::string());
-  std::optional<tokenize::Token> expectOperator(const std::string &name = std::string());
-  std::vector<tokenize::Token>::iterator mCurrentToken;
-  std::vector<tokenize::Token>::iterator mEndToken;
-  std::map<std::string, Type> mTypes;
-};
+        std::tuple<bool, simpleParser::modelDefinition> expectModelDefinition();
+
+        std::tuple<bool, vector<simpleParser::ioDefinition>> expectInputsDefinition();
+
+        std::tuple<bool, vector<simpleParser::ioDefinition>> expectOutputsDefinition();
+
+        std::tuple<bool, simpleParser::gateDefinition> expectGateDefinition();
+
+        bool expectEndModule();
+
+        std::optional<tokenize::Token> expectIdentifier(const std::string &name = std::string());
+
+        std::optional<tokenize::Token> expectOperator(const std::string &name = std::string());
+
+
+        std::vector<tokenize::Token>::iterator mCurrentToken;
+        std::vector<tokenize::Token>::iterator mEndToken;
+
+    };
 
 } // namespace simpleParser
