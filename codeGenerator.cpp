@@ -1,12 +1,12 @@
 #include "codeGenerator.hpp"
 #include <iostream>
 #include <algorithm>
-
+#include <set>
 using namespace std;
 
 string codeGenerator::generateVerilog(std::unique_ptr<simpleParser::netlistDefiniton> &netlist_ptr) {
     std::string verilogText;
-    std::vector<std::string> netNames;//wires
+    std::set<std::string> netNames;//wires is set to avoid repetitions
     std::vector<std::string> inputNames; //inputs buffer to filter them out from wires
     std::vector<std::string> outputNames;//outputs buffer to filter them out from wires
 
@@ -24,7 +24,7 @@ string codeGenerator::generateVerilog(std::unique_ptr<simpleParser::netlistDefin
         for (const auto &net: gate.mPins) {
             if (find(inputsPtr->begin(), inputsPtr->end(), net.mPin) == inputsPtr->end() &&
                 find(outputsPtr->begin(), outputsPtr->end(), net.mPin) == outputsPtr->end()) {
-                netNames.push_back(net.mPin);
+                netNames.insert(net.mPin);
             }
         }
     }
@@ -95,21 +95,26 @@ string codeGenerator::generateVerilog(std::unique_ptr<simpleParser::netlistDefin
     verilogText += "\n";
     verilogText += "\n";
 
-    //cout << "wire ";
+
     verilogText += "wire ";
-    for (int net = 0; net < netNames.size(); net++) {
-        if (net % 8 == 0 && net != 0) {
+    int setCounter = 0;
+    for (const auto &setElement : netNames) {
+        if (setCounter % 8 == 0 && setCounter != 0) {
             // Start a new line with "wire" keyword
             verilogText += "wire ";
+            setCounter++;
         }
-        // Append the wire name
-        if (net % 8 == 7 || net == netNames.size() - 1) {
+
+        if (setCounter % 8 == 7 || setCounter == netNames.size() - 1) {
             // Last wire in the group or last wire overall
-            verilogText += netNames[net] + ";\n"; // Add semicolon and newline
+            verilogText += setElement + ";\n"; // Add semicolon and newline
+            setCounter++;
         } else {
             // Wire in the group but not the last one
-            verilogText += netNames[net] + ", ";
+            verilogText += setElement + ", ";
+            setCounter++;
         }
+
     }
 
     //cout << endl;
