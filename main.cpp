@@ -1,6 +1,7 @@
 #include "parser.hpp"
 #include "tokenizer.hpp"
 #include "codeGenerator.hpp"
+#include "preprocess.hpp"
 #include <iostream>
 #include <fstream>
 #include <cstdio>
@@ -10,9 +11,17 @@
 using namespace std;
 
 int main(int argc, char *argv[]) {
-    cout << "Blif Parser Start :" << endl;
+    if (argc < 2 || argc > 3) {
+        cerr << "Usage: " << argv[0] << " file.blif [generated.v]" << endl;
+        return 1;
+    }
 
-    FILE *fh = fopen("../example2.blif", "r");
+    const char* blifFileName = argv[1];
+    const char* verilogFileName = (argc == 3) ? argv[2] : "file.v";
+
+    cout << "Blif Parser Start..." << endl;
+
+    FILE *fh = fopen(blifFileName, "r");
     if (!fh) {
         cerr << "Couldn't open file for some reason" << endl;
     }
@@ -28,6 +37,10 @@ int main(int argc, char *argv[]) {
     //Uncomment to pring file contents
     //cout << fileContents << endl;
 
+
+    KeywordReplacer::replaceKeywords(&fileContents); //Preprocessor to replace gates to desired namings
+
+
     vector<tokenize::Token> tokens = tokenize::Tokenizer::parse(fileContents);
 
     //uncomment to print all tokens
@@ -42,34 +55,25 @@ int main(int argc, char *argv[]) {
 
     // Define the NetlistPtr type alias for std::unique_ptr<simpleParser::netlistDefiniton>
     using NetlistPtr = std::unique_ptr<simpleParser::netlistDefiniton>;
-
     // Declare a unique pointer to hold the netlist object
     NetlistPtr netlist_ptr;
-
     // Assign the netlist object to the unique pointer
     netlist_ptr = std::make_unique<simpleParser::netlistDefiniton>(netlist_object);
 
-    std::string verilogText  = codeGenerator::generateVerilog(netlist_ptr);
+
+    std::string verilogText = codeGenerator::generateVerilog(netlist_ptr);
 
 
 
     // Write Verilog text to a file
-    std::ofstream outputFile("example.v");
+    std::ofstream outputFile(verilogFileName);
     if (outputFile.is_open()) {
         outputFile << verilogText;
         outputFile.close();
         std::cout << "Verilog file generated successfully!\n";
     } else {
-        std::cerr << "Unable to open file for writing!\n";
+        std::cerr << "Unable to open file " << verilogFileName << " for writing!\n";
+        return 1;
     }
-//    Jinja2CppLight::Template mytemplate( R"d(
-//        This is my {{avalue}} template.  It's {{secondvalue}}...
-//        Today's weather is {{weather}}.
-//    )d" );
-//    mytemplate.setValue( "avalue", 3 );
-//    mytemplate.setValue( "secondvalue", 12.123f );
-//    mytemplate.setValue( "weather", "rain" );
-//    string result = mytemplate.render();
-//    cout << result << endl;
-
+    return 0;
 }

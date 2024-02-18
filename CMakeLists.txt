@@ -14,8 +14,10 @@ add_library( blif2verilog_internals
         blifDefinition.hpp
         codeGenerator.cpp
         codeGenerator.hpp
+        preprocess.hpp
 )
 
-add_executable(blif2verilog main.cpp)
+add_executable(blif2verilog main.cpp
+        mappings.hpp)
 
 target_link_libraries(blif2verilog blif2verilog_internals)
